@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "@notifee/react-native": "^7.7.1",
+    "@react-native-firebase/app": "^17.4.3",
+    "@react-native-firebase/messaging": "^17.4.3",
     "expo": "~48.0.15",
+    "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
     "react": "18.2.0",
-    "react-native": "0.71.7",
-    "expo-splash-screen": "~0.18.2"
+    "react-native": "0.71.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

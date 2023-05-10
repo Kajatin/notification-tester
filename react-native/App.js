@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
+
+import messaging from "@react-native-firebase/messaging";
 import notifee from "@notifee/react-native";
 
 function getCurrentTimeAsString() {
@@ -13,6 +15,24 @@ export default function App() {
   const [lastNotificationTime, setLastNotificationTime] = useState("00:00:00");
   const [scheduleStart, setScheduleStart] = useState("00:00:00");
   const [currentTime, setCurrentTime] = useState(getCurrentTimeAsString());
+  const [fcmToken, setFcmToken] = useState(null);
+
+  useEffect(() => {
+    if (!fcmToken) {
+      (async () => {
+        if (!messaging().isDeviceRegisteredForRemoteMessages) {
+          await messaging().registerDeviceForRemoteMessages();
+        }
+        if (!(await messaging().hasPermission())) {
+          const permission = await messaging().requestPermission();
+          console.log("permission", permission);
+        }
+        const token = await messaging().getToken();
+        console.log("token", token);
+        setFcmToken(token);
+      })();
+    }
+  }, [fcmToken]);
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -57,26 +77,30 @@ export default function App() {
     });
 
     // Display a notification
-    await notifee.displayNotification({
-      title: "Beep Boop 🤖",
-      body: "Notification coming through",
-      android: {
-        channelId,
-        smallIcon: "name-of-a-small-icon", // optional, defaults to 'ic_launcher'.
-        // pressAction is needed if you want the notification to open the app when pressed
-        pressAction: {
-          id: "default",
+    try {
+      await notifee.displayNotification({
+        title: "Beep Boop 🤖",
+        body: "Notification coming through",
+        android: {
+          channelId,
+          smallIcon: "name-of-a-small-icon", // optional, defaults to 'ic_launcher'.
+          // pressAction is needed if you want the notification to open the app when pressed
+          pressAction: {
+            id: "default",
+          },
         },
-      },
-      ios: {
-        sound: "attention.m4r",
-        critical: true,
-        criticalVolume: 1,
-      },
-      data: {
-        screen: "home",
-      },
-    });
+        ios: {
+          sound: "attention.m4r",
+          critical: true,
+          criticalVolume: 1,
+        },
+        data: {
+          screen: "home",
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
 
     setCounter(counter + 1);
     setLastNotificationTime(getCurrentTimeAsString());
