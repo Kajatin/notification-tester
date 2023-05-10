@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
 import messaging from "@react-native-firebase/messaging";
 import notifee from "@notifee/react-native";
@@ -16,6 +16,23 @@ export default function App() {
   const [scheduleStart, setScheduleStart] = useState("00:00:00");
   const [currentTime, setCurrentTime] = useState(getCurrentTimeAsString());
   const [fcmToken, setFcmToken] = useState(null);
+  const [message, setMessage] = useState("waiting for message");
+
+  // Note that an async function or a function that returns a Promise
+  // is required for both subscribers.
+  async function onMessageReceived(message) {
+    console.log("onMessageReceived", message);
+    setMessage(JSON.stringify(message));
+    onDisplayNotification();
+  }
+
+  async function setupMessaging() {
+    messaging().onMessage(onMessageReceived);
+  }
+
+  useEffect(() => {
+    setupMessaging();
+  }, []);
 
   useEffect(() => {
     if (!fcmToken) {
@@ -24,7 +41,12 @@ export default function App() {
           await messaging().registerDeviceForRemoteMessages();
         }
         if (!(await messaging().hasPermission())) {
-          const permission = await messaging().requestPermission();
+          const permission = await messaging().requestPermission({
+            alert: true,
+            badge: true,
+            criticalAlert: true,
+            sound: true,
+          });
           console.log("permission", permission);
         }
         const token = await messaging().getToken();
@@ -90,7 +112,8 @@ export default function App() {
           },
         },
         ios: {
-          sound: "attention.m4r",
+          // sound: "attention.m4r",
+          sound: "default",
           critical: true,
           criticalVolume: 1,
         },
@@ -108,6 +131,10 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.center}>
+        <Text style={styles.title}>{message}</Text>
+      </View>
+
       <View style={styles.spacing} />
 
       <View style={styles.center}>

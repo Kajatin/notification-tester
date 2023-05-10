@@ -1,0 +1,15 @@
+{
+  "name": "firebase-messenger",
+  "version": "1.0.0",
+  "description": "Send some firebase messages on demand",
+  "main": "messenger.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "firebase-admin": "^11.8.0"
+  }
+}
