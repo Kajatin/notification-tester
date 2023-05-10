@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct Notification_TesterApp: App {
+    let viewModel = ViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(viewModel)
         }
     }
 }
