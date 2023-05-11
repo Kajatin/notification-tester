@@ -30,7 +30,7 @@ async function sendMessageToDevice(token) {
       },
       headers: {
         "apns-push-type": "alert",
-        "apns-priority": "10",
+        "apns-priority": "5",
         "apns-topic": "com.gmail.rolandkajatin.notificationsreactnative",
       },
     },
