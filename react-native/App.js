@@ -20,21 +20,11 @@ export default function App() {
   const [fcmToken, setFcmToken] = useState(null);
   const [message, setMessage] = useState("waiting for message");
 
-  // Note that an async function or a function that returns a Promise
-  // is required for both subscribers.
   async function onMessageReceived(message) {
     console.log("onMessageReceived", message);
     setMessage(JSON.stringify(message).slice(0, 50));
-    onDisplayNotification();
+    await onDisplayNotification();
   }
-
-  async function setupMessaging() {
-    messaging().onMessage(onMessageReceived);
-  }
-
-  useEffect(() => {
-    setupMessaging();
-  }, []);
 
   useEffect(() => {
     if (!fcmToken) {
@@ -52,11 +42,15 @@ export default function App() {
           console.log("permission", permission);
         }
         const token = await messaging().getToken();
-        console.log("token", token);
+        console.log("FCM token: ", token);
         setFcmToken(token);
       })();
     }
   }, [fcmToken]);
+
+  useEffect(() => {
+    messaging().onMessage(onMessageReceived);
+  }, []);
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -105,7 +99,7 @@ export default function App() {
         <View>
           <TouchableOpacity
             style={styles.button}
-            onPress={async () => onDisplayNotification()}
+            onPress={async () => await onDisplayNotification()}
           >
             <Text style={styles.buttonText}>Send notification</Text>
           </TouchableOpacity>

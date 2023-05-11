@@ -12,7 +12,7 @@ async function sendMessageToDevice(token) {
   const patient_event = {
     id: "1234",
     bed: 8,
-    timestamp: "2023-05-11T08:00:00.000Z",
+    timestamp: "2023-05-11T18:20:00.000Z",
     type: "out_of_bed",
     action: "laying_on_floor",
   };
@@ -29,8 +29,9 @@ async function sendMessageToDevice(token) {
         },
       },
       headers: {
-        "apns-push-type": "alert",
+        "apns-push-type": "background",
         "apns-priority": "5",
+        // "apns-topic": "ai.teton.alertsios",
         "apns-topic": "com.gmail.rolandkajatin.notificationsreactnative",
       },
     },
