@@ -5,7 +5,6 @@ require("dotenv").config();
 // Initialize Firebase
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
-  // databaseURL: "https://" + process.env.FIREBASE_DATABASE + ".firebaseio.com",
 });
 
 async function sendMessageToDevice(token) {
@@ -31,8 +30,7 @@ async function sendMessageToDevice(token) {
       headers: {
         "apns-push-type": "background",
         "apns-priority": "5",
-        // "apns-topic": "ai.teton.alertsios",
-        "apns-topic": "com.gmail.rolandkajatin.notificationsreactnative",
+        "apns-topic": process.env.FIREBASE_MESSAGING_APNS_TOPIC,
       },
     },
     // notification: {
