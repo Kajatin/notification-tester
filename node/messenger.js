@@ -9,32 +9,40 @@ admin.initializeApp({
 });
 
 async function sendMessageToDevice(token) {
-  console.log("sendMessageToDevice", token);
+  const patient_event = {
+    id: "1234",
+    bed: 8,
+    timestamp: "2023-05-11T08:00:00.000Z",
+    type: "out_of_bed",
+    action: "laying_on_floor",
+  };
 
   let message = {
     token: token,
-    data: { hello: "world!" },
+    android: {
+      priority: "high",
+    },
     apns: {
       payload: {
         aps: {
-          "content-available": 1,
-          alert: {
-            title: "Hello",
-            body: "Hello world!",
-          },
-          badge: 1,
-          sound: "default",
-          notification: {
-            title: "Hello",
-            body: "Hello world!",
-          },
+          contentAvailable: true,
         },
       },
       headers: {
+        // "apns-push-type": "alert",
         "apns-push-type": "background",
         "apns-priority": "5",
-        // "apns-topic": process.env.FIREBASE_MESSAGING_APNS_TOPIC,
+        "apns-topic": "com.gmail.rolandkajatin.notificationsreactnative",
       },
+    },
+    data: {
+      type: "patient_event",
+      body: JSON.stringify(patient_event),
+      medical_staff_in_room: "false",
+      // visitor_in_room: !!latest_visitor_event?.data
+      //     ?.visitors_in_room
+      //     ? 'true'
+      //     : 'false',
     },
   };
 

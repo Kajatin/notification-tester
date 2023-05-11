@@ -4,8 +4,15 @@ import messaging from "@react-native-firebase/messaging";
 
 import App from "./App";
 
+async function onBackgroundMessage(message) {
+  try {
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  console.log("Message handled in the background!", remoteMessage);
+  await onBackgroundMessage(remoteMessage);
 });
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

@@ -15,3 +15,4 @@ Send and receive simple test notification on the device. This app uses the `UNUs
 `npm install`
 `npx expo prebuild`
 `npm run ios`
+`expo run:ios --device`
