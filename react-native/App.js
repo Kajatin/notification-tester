@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
 import messaging from "@react-native-firebase/messaging";
-import notifee from "@notifee/react-native";
+import notifee, { AndroidImportance } from "@notifee/react-native";
 
 function getCurrentTimeAsString() {
   return new Date().toLocaleTimeString();
@@ -22,7 +22,7 @@ export default function App() {
   // is required for both subscribers.
   async function onMessageReceived(message) {
     console.log("onMessageReceived", message);
-    setMessage(JSON.stringify(message));
+    setMessage(JSON.stringify(message).slice(0, 50));
     onDisplayNotification();
   }
 
@@ -92,10 +92,15 @@ export default function App() {
     // Request permissions (required for iOS)
     await notifee.requestPermission();
 
+    const channelIdName = "default2";
+
     // Create a channel (required for Android)
     const channelId = await notifee.createChannel({
-      id: "default",
+      id: channelIdName,
       name: "Default Channel",
+      // vibration: true,
+      // importance: AndroidImportance.HIGH,
+      sound: "default",
     });
 
     // Display a notification
@@ -105,11 +110,11 @@ export default function App() {
         body: "Notification coming through",
         android: {
           channelId,
-          smallIcon: "name-of-a-small-icon", // optional, defaults to 'ic_launcher'.
+          // smallIcon: "name-of-a-small-icon", // optional, defaults to 'ic_launcher'.
           // pressAction is needed if you want the notification to open the app when pressed
-          pressAction: {
-            id: "default",
-          },
+          // pressAction: {
+          //   id: "default",
+          // },
         },
         ios: {
           // sound: "attention.m4r",
