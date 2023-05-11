@@ -3,7 +3,9 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
 import messaging from "@react-native-firebase/messaging";
-import notifee, { AndroidImportance } from "@notifee/react-native";
+import notifee from "@notifee/react-native";
+
+import onDisplayNotification from "./notificationHandler";
 
 function getCurrentTimeAsString() {
   return new Date().toLocaleTimeString();
@@ -86,52 +88,6 @@ export default function App() {
       setIntervalId(null);
       notifee.cancelAllNotifications();
     }
-  }
-
-  async function onDisplayNotification() {
-    // Request permissions (required for iOS)
-    await notifee.requestPermission();
-
-    const channelIdName = "default2";
-
-    // Create a channel (required for Android)
-    const channelId = await notifee.createChannel({
-      id: channelIdName,
-      name: "Default Channel",
-      // vibration: true,
-      // importance: AndroidImportance.HIGH,
-      sound: "default",
-    });
-
-    // Display a notification
-    try {
-      await notifee.displayNotification({
-        title: "Beep Boop 🤖",
-        body: "Notification coming through",
-        android: {
-          channelId,
-          // smallIcon: "name-of-a-small-icon", // optional, defaults to 'ic_launcher'.
-          // pressAction is needed if you want the notification to open the app when pressed
-          // pressAction: {
-          //   id: "default",
-          // },
-        },
-        ios: {
-          // sound: "attention.m4r",
-          sound: "default",
-          critical: true,
-          criticalVolume: 1,
-        },
-        data: {
-          screen: "home",
-        },
-      });
-    } catch (e) {
-      console.log(e);
-    }
-
-    setCounter(counter + 1);
-    setLastNotificationTime(getCurrentTimeAsString());
   }
 
   return (

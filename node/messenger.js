@@ -29,13 +29,17 @@ async function sendMessageToDevice(token) {
         },
       },
       headers: {
-        // "apns-push-type": "alert",
-        "apns-push-type": "background",
-        "apns-priority": "5",
+        "apns-push-type": "alert",
+        "apns-priority": "10",
         "apns-topic": "com.gmail.rolandkajatin.notificationsreactnative",
       },
     },
+    // notification: {
+    //   title: "Beep Boop 🤖",
+    //   body: "Notification 1 coming through",
+    // },
     data: {
+      title: "Beep Boop 🤖",
       type: "patient_event",
       body: JSON.stringify(patient_event),
       medical_staff_in_room: "false",

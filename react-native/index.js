@@ -3,9 +3,12 @@ import { registerRootComponent } from "expo";
 import messaging from "@react-native-firebase/messaging";
 
 import App from "./App";
+import onDisplayNotification from "./notificationHandler";
 
 async function onBackgroundMessage(message) {
   try {
+    console.log("Background notification received");
+    onDisplayNotification();
   } catch (error) {
     console.error(error);
   }
