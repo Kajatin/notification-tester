@@ -14,6 +14,7 @@ async function sendMessageToDevice(token) {
     timestamp: "2023-05-11T18:20:00.000Z",
     type: "out_of_bed",
     action: "laying_on_floor",
+    fcm_ts: new Date().toLocaleTimeString("da-DK"),
   };
 
   let message = {
@@ -33,10 +34,10 @@ async function sendMessageToDevice(token) {
         "apns-topic": process.env.FIREBASE_MESSAGING_APNS_TOPIC,
       },
     },
-    // notification: {
-    //   title: "Beep Boop 🤖",
-    //   body: "Notification 1 coming through",
-    // },
+    notification: {
+      title: "Beep Boop 🤖",
+      body: JSON.stringify(patient_event),
+    },
     data: {
       title: "Beep Boop 🤖",
       type: "patient_event",

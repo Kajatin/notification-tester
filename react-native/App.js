@@ -8,7 +8,7 @@ import notifee from "@notifee/react-native";
 import onDisplayNotification from "./notificationHandler";
 
 function getCurrentTimeAsString() {
-  return new Date().toLocaleTimeString();
+  return new Date().toLocaleTimeString("da-DK");
 }
 
 export default function App() {
@@ -20,10 +20,16 @@ export default function App() {
   const [fcmToken, setFcmToken] = useState(null);
   const [message, setMessage] = useState("waiting for message");
 
+  function updateCounters() {
+    setCounter(counter + 1);
+    setLastNotificationTime(getCurrentTimeAsString());
+  }
+
   async function onMessageReceived(message) {
     console.log("onMessageReceived", message);
-    setMessage(JSON.stringify(message).slice(0, 50));
-    await onDisplayNotification();
+    setMessage(message.data.title);
+    updateCounters();
+    await onDisplayNotification(message);
   }
 
   useEffect(() => {
@@ -70,6 +76,7 @@ export default function App() {
     setScheduleStart(getCurrentTimeAsString());
 
     const id = setInterval(async () => {
+      updateCounters();
       await onDisplayNotification();
     }, 10 * 1000);
 
@@ -99,7 +106,10 @@ export default function App() {
         <View>
           <TouchableOpacity
             style={styles.button}
-            onPress={async () => await onDisplayNotification()}
+            onPress={async () => {
+              updateCounters();
+              await onDisplayNotification();
+            }}
           >
             <Text style={styles.buttonText}>Send notification</Text>
           </TouchableOpacity>

@@ -3,7 +3,7 @@ import notifee, {
   AuthorizationStatus,
 } from "@notifee/react-native";
 
-export default async function onDisplayNotification() {
+export default async function onDisplayNotification(message) {
   notifee.requestPermission({
     alert: true,
     badge: true,
@@ -26,11 +26,15 @@ export default async function onDisplayNotification() {
     sound: "polite",
   });
 
+  const currentTime = new Date().toLocaleTimeString("da-DK");
+  constParsed = JSON.parse(message?.data?.body || "{}");
+  const body = (constParsed?.fcm_ts || "??") + " - " + currentTime;
+
   // Display a notification
   try {
     await notifee.displayNotification({
-      title: "Beep Boop 🤖",
-      body: "Notification coming through",
+      title: message?.data?.title || "Beep Boop 🤖",
+      body: body,
       android: {
         channelId,
         // smallIcon: "name-of-a-small-icon", // optional, defaults to 'ic_launcher'.
@@ -42,17 +46,14 @@ export default async function onDisplayNotification() {
       ios: {
         // sound: "attention.m4r",
         sound: "default",
-        critical: true,
-        criticalVolume: 1,
+        // critical: true,
+        // criticalVolume: 1,
       },
-      data: {
-        screen: "home",
-      },
+      // data: {
+      //   screen: "home",
+      // },
     });
   } catch (e) {
     console.log(e);
   }
-
-  //   setCounter(counter + 1);
-  //   setLastNotificationTime(getCurrentTimeAsString());
 }

@@ -8,7 +8,7 @@ import onDisplayNotification from "./notificationHandler";
 async function onBackgroundMessage(message) {
   try {
     console.log("Background notification received");
-    onDisplayNotification();
+    onDisplayNotification(message);
   } catch (error) {
     console.error(error);
   }
