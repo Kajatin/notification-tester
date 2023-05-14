@@ -8,7 +8,33 @@ import notifee from "@notifee/react-native";
 import onDisplayNotification from "./notificationHandler";
 
 function getCurrentTimeAsString() {
-  return new Date().toLocaleTimeString("da-DK");
+  return new Date().toLocaleTimeString("en-GB");
+}
+
+function generateMessage() {
+  const currentIsoDateTime = new Date().toISOString();
+
+  const patient_alert = {
+    id: Math.floor(Math.random() * 1000000).toString(),
+    bed: 7,
+    alert_sent: false,
+    type: "out_of_bed",
+    action: "laying_on_floor",
+    created_on: currentIsoDateTime,
+    timestamp: currentIsoDateTime,
+    uuid: Math.floor(Math.random() * 1000000).toString(),
+  };
+
+  return {
+    data: {
+      notificationLevel: "alert",
+      type: "patient_alert",
+      origin: "roland",
+      fcm_ts: getCurrentTimeAsString(),
+      channelId: "alert_v2",
+      patientEvent: JSON.stringify(patient_alert),
+    },
+  };
 }
 
 export default function App() {
@@ -21,13 +47,15 @@ export default function App() {
   const [message, setMessage] = useState("waiting for message");
 
   function updateCounters() {
-    setCounter(counter + 1);
+    setCounter((prevCounter) => prevCounter + 1);
     setLastNotificationTime(getCurrentTimeAsString());
   }
 
   async function onMessageReceived(message) {
-    console.log("onMessageReceived", message);
-    setMessage(message.data.title);
+    const fcmTime = message?.data?.fcm_ts || "??";
+    const currentTime = getCurrentTimeAsString();
+    setMessage(fcmTime + " - " + currentTime);
+
     updateCounters();
     await onDisplayNotification(message);
   }
@@ -38,6 +66,7 @@ export default function App() {
         if (!messaging().isDeviceRegisteredForRemoteMessages) {
           await messaging().registerDeviceForRemoteMessages();
         }
+
         if (!(await messaging().hasPermission())) {
           const permission = await messaging().requestPermission({
             alert: true,
@@ -45,8 +74,8 @@ export default function App() {
             criticalAlert: true,
             sound: true,
           });
-          console.log("permission", permission);
         }
+
         const token = await messaging().getToken();
         console.log("FCM token: ", token);
         setFcmToken(token);
@@ -61,34 +90,36 @@ export default function App() {
   useEffect(() => {
     const timerId = setInterval(() => {
       setCurrentTime(getCurrentTimeAsString());
-    }, 1000);
+    }, 500);
 
     return () => {
       clearInterval(timerId);
     };
   }, []);
 
-  async function onStartScheduling() {
+  function onStartSchedule() {
     if (intervalId) {
       return;
     }
 
-    setScheduleStart(getCurrentTimeAsString());
-
     const id = setInterval(async () => {
-      updateCounters();
-      await onDisplayNotification();
+      const localMessage = generateMessage();
+      await onMessageReceived(localMessage);
     }, 10 * 1000);
 
     setIntervalId(id);
+    setScheduleStart(getCurrentTimeAsString());
   }
 
-  async function onStopScheduling() {
-    if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
-      notifee.cancelAllNotifications();
+  function onStopSchedule() {
+    if (!intervalId) {
+      return;
     }
+
+    setIntervalId(null);
+    clearInterval(intervalId);
+    notifee.cancelAllNotifications();
+    notifee.cancelDisplayedNotifications();
   }
 
   return (
@@ -107,8 +138,8 @@ export default function App() {
           <TouchableOpacity
             style={styles.button}
             onPress={async () => {
-              updateCounters();
-              await onDisplayNotification();
+              const localMessage = generateMessage();
+              await onMessageReceived(localMessage);
             }}
           >
             <Text style={styles.buttonText}>Send notification</Text>
@@ -127,7 +158,7 @@ export default function App() {
         <View>
           <TouchableOpacity
             style={styles.button}
-            onPress={async () => onStartScheduling()}
+            onPress={() => onStartSchedule()}
           >
             <Text style={styles.buttonText}>Start</Text>
           </TouchableOpacity>
@@ -135,7 +166,7 @@ export default function App() {
         <View>
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={async () => onStopScheduling()}
+            onPress={() => onStopSchedule()}
           >
             <Text style={styles.cancelButtonText}>Stop</Text>
           </TouchableOpacity>
@@ -148,7 +179,7 @@ export default function App() {
         <TouchableOpacity
           onPress={async () => {
             setCounter(0);
-            await onStopScheduling();
+            onStopSchedule();
           }}
         >
           <Text style={styles.cancelButtonText}>Reset</Text>

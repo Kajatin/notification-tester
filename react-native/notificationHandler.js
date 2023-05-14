@@ -12,23 +12,25 @@ export default async function onDisplayNotification(message) {
 
   const settings = await notifee.getNotificationSettings();
   if (settings.authorizationStatus == AuthorizationStatus.AUTHORIZED) {
-    console.log("Notification permissions has been AUTHORIZED");
+    // console.log("Notification permissions has been AUTHORIZED");
   } else if (settings.authorizationStatus == AuthorizationStatus.DENIED) {
     console.log("Notification permissions has been DENIED");
   }
 
   // Create a channel (required for Android)
+  const channelName = message.data.channelId;
+  const notificationLevel = message.data.notificationLevel;
   const channelId = await notifee.createChannel({
-    id: "default7",
-    name: "Default 7",
+    id: channelName,
+    name: channelName,
     // vibration: true,
     // importance: AndroidImportance.HIGH,
-    sound: "polite",
+    sound: notificationLevel === "notification" ? "polite" : "continuousbeat",
   });
 
-  const currentTime = new Date().toLocaleTimeString("da-DK");
-  constParsed = JSON.parse(message?.data?.body || "{}");
-  const body = (constParsed?.fcm_ts || "??") + " - " + currentTime;
+  const fcmTime = message?.data?.fcm_ts || "??";
+  const currentTime = new Date().toLocaleTimeString("en-GB");
+  const body = fcmTime + " - " + currentTime;
 
   // Display a notification
   try {
@@ -54,6 +56,6 @@ export default async function onDisplayNotification(message) {
       // },
     });
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 }
