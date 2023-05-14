@@ -36,7 +36,8 @@ credential files:
 
 Additionally, for the `node` backend to be able to send messages, you'll need the
 service account credentials JSON file and set the path in the `GOOGLE_APPLICATION_CREDENTIALS`
-environment variable.
+environment variable. You should also set `FIREBASE_MESSAGING_APNS_TOPIC` to the bundle ID
+of your app.
 
 When you launch the app, the device will log its token to the console. You can use this token
 to send messages to the device with the `messenger.js` script. Make sure to set the
